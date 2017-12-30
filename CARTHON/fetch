@@ -35,7 +35,7 @@ function DoAction
 	case $accion in
 		-print) 
 			##Si se encuentra en el directorio actual cambia el formato de impresión
-			if [[ "$path" == "$PWD" ]]; then 				echo "./$fichero"
+			if [[ "$path" == "$PWD" ]]; then 					echo "./$fichero"
 			else
 				echo "$path/$fichero"
 			fi
