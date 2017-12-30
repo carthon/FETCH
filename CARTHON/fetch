@@ -24,7 +24,6 @@ condicionselec="$2"
 criterioselec="$3"
 accion="$4"
 estadoUsuario=$UID
-
 echo $estadoUsuario
 
 ##Comprobamos si existe el directorio pasado
@@ -32,6 +31,9 @@ if [ ! -r $path ]; then
 	ShowError 2 "No se puede leer el directorio."
 	exit 1
 fi
+
+accion1="grep $criterioselec"
+accion2="sort"
 
 case $condicionselec in
 	-t)
@@ -48,14 +50,17 @@ case $condicionselec in
 
 	-n)
 		echo Selección por cadena
+		#El criterio de selección se recoge al principio del script.
 		;;
 	-p)	
 		echo Selección por permisos de archivo
+		accion2='cut -b 2-10'
+		;;
 		
 esac
 
 case $accion in
-	-print) ls -l $path | grep $criterioselec
+	-print) ls -l $path | $accion1
 		;;
 	*) ShowError 1 "Opción no válida."
 		;;
