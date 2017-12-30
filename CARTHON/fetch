@@ -26,23 +26,32 @@ accion="$4"
 estadoUsuario=$UID
 echo $estadoUsuario
 
+##Ejecuta la acción
+function DoAction
+{
+	case $accion in
+		-print) ls -l $path | grep $criterioselec
+			;;
+		*) ShowError 1 "Opción no válida."
+			;;
+	esac
+}
+
 ##Comprobamos si existe el directorio pasado
 if [ ! -r $path ]; then
 	ShowError 2 "No se puede leer el directorio."
 	exit 1
 fi
-
-accion1="grep $criterioselec"
-accion2="sort"
-
 case $condicionselec in
 	-t)
 		case $criterioselec in
 			f) echo Criterio de seleccion por ficheros
 				criterioselec="^-"
+				DoAction
 				;;
 			d) echo Criterio de seleccion por directorios
 				criterioselec="^d"
+				DoAction
 				;;
 			*) ShowError 1 "Opción no válida."
 		esac
@@ -51,21 +60,12 @@ case $condicionselec in
 	-n)
 		echo Selección por cadena
 		#El criterio de selección se recoge al principio del script.
+		DoAction
 		;;
 	-p)	
 		echo Selección por permisos de archivo
-		accion2='cut -b 2-10'
+		criterioselec="^.$criterioselec"
+		DoAction
 		;;
 		
 esac
-
-case $accion in
-	-print) ls -l $path | $accion2 | $accion1
-		;;
-	*) ShowError 1 "Opción no válida."
-		;;
-esac
-
-
-
-
