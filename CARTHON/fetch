@@ -55,9 +55,12 @@ case $condicionselec in
 esac
 
 case $accion in
-	-print)ls -l | grep $criterioselec
+	-print) ls -l $path | grep $criterioselec
 		;;
 	*) ShowError 1 "Opción no válida."
 		;;
 esac
+
+
+
 
