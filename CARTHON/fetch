@@ -60,7 +60,7 @@ case $condicionselec in
 esac
 
 case $accion in
-	-print) ls -l $path | $accion1
+	-print) ls -l $path | $accion2 | $accion1
 		;;
 	*) ShowError 1 "Opción no válida."
 		;;
