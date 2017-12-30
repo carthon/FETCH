@@ -67,5 +67,17 @@ case $condicionselec in
 		criterioselec="^.$criterioselec"
 		DoAction
 		;;
+	-c)
+		echo Selección por contenido de archivos
+		for file in $(ls $path);
+		do
+			if [[ -r $path/$file ]] && [[ ! -d $path/$file ]]; then		
+				criterioselec="$criterioselec $path/$file"
+				echo "$path/$file"
+			elif [[ ! -d $path/$file ]]; then
+				ShowError 3 "No se puede leer el archivo $file."
+			fi
+		done
 		
+		;;		
 esac
