@@ -1,0 +1,113 @@
+#!/bin/bash
+
+##Uso del programa y salida
+function UsageAndExit
+{
+	echo "Usage: fetch <dir> <opseleccion> <criterioselec> <accion>"
+	exit 0
+}
+
+##Funcion de Error
+## Argumento1: Codigo del Error
+## Argumento2: Descripción del Error
+function ShowError
+{
+	echo "$0: Error($1) $2"
+}
+
+##Si el programa supera o es menor a los 4 argumentos muestra el modo de uso y sale
+if [[ $# -lt 4 ]]; then
+	UsageAndExit
+elif [[ $# -gt 4 ]]; then
+	mandato="$5"
+	argumento="$6"
+fi
+
+##Recopilación de Argumentos en variables
+path="$1"
+condicionselec="$2"
+criterioselec="$3"
+accion="$4"
+estadoUsuario=$UID
+
+##Ejecuta la acción escrita en el ultimo argumento
+##Argumento1: Nombre del archivo.
+function DoAction
+{
+	fichero=$1
+	case $accion in
+		-print) 
+			##Si se encuentra en el directorio actual cambia el formato de impresión
+			if [[ "$path" == "$PWD" ]]; then 					
+				echo "./$fichero"
+			else
+				echo "$path/$fichero"
+			fi
+			;;
+		-exec)
+			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion
+			comprobacion="command -v $mandato"				##Comprueba si el comando existe (falta saber como saber si lo devuelvo o no lo devuelve)	
+			if [[ $($comprobacion) ]]; then 		
+				echo "Nice"
+			else
+				ShowError 4 "No se puede ejecutar el comando"
+			fi
+			;;
+		*) 
+			##Si no hay un argumento válido lanza el siguiente error.
+			ShowError 1 "Opción no válida."
+			;;
+	esac
+}
+
+##Comprobamos si existe el directorio pasado
+if [ ! -r $path ]; then
+	ShowError 2 "No se puede leer el directorio."
+	exit 1
+fi
+##Iniciamos un bucle que compruebe todos los archivos en el path dado.
+for file in $(ls $path);
+do
+	case $condicionselec in
+		-t)
+			case $criterioselec in
+				f) 
+					##Si el archivo es un archivo regular pasa el archivo
+					if [[ -f $path/$file ]]; then
+						DoAction $file
+					fi
+					;;
+				d) 
+					##Si el archivo es un directorio, pasa el archivo
+					if [[ -d $path/$file ]]; then
+						DoAction $file
+					fi
+					;;
+				*) 
+					ShowError 1 "Opción no válida."
+					;;
+			esac
+			;;
+	
+		-n)
+			##Si el nombre del archivo contiene alguno de los caracteres indicados, ejecuta una acción
+			if [[ "$file" == *"$criterioselec"* ]]; then
+				DoAction $file
+			fi
+			;;
+		-p)	
+			##Si los permisos del archivo (stat -c %A - Legibles en lenguaje humano) son iguales a los escritos...
+			permisos=$(stat -c %A $path/$file)
+			if [[ "$permisos" == *"$criterioselec"* ]]; then
+				DoAction $file
+			fi
+			;;
+		-c)
+			##Si se encuentra la cadena (usando grep -s para eliminar advertencias) ejecuta una acción
+			if [[ $(grep -s $criterioselec < $path/$file) ]]; then
+				DoAction $file
+			fi
+			;;		
+	esac
+done
+
