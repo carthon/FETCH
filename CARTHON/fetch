@@ -18,8 +18,10 @@ function ShowError
 ##Si el programa supera o es menor a los 4 argumentos muestra el modo de uso y sale
 if [[ $# -lt 4 ]]; then
 	UsageAndExit
+elif [[ $# -gt 4 ]]; then
+	mandato="$5"
+	argumento="$6"
 fi
-
 ##Recopilación de Argumentos en variables
 path="$1"
 shift
@@ -52,6 +54,17 @@ function DoAction
 			done
 			;;
 		-pipe)
+			;;
+		-exec)
+			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion
+			##Para ver si existe el mandato [solucionar problema de impresion (se imprime lo que comprueba el comando)]
+			comprobacion="command -v $mandato"		
+			$comprobacion
+			if [[ $? -eq 0 ]]; then 
+			 	##Meter el fork para poder crear hijos				
+			else
+				ShowError 4 "No se puede ejecutar el comando"
+			fi
 			;;
 		*) 
 			##Si no hay un argumento válido lanza el siguiente error.
