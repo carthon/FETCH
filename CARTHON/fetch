@@ -16,29 +16,42 @@ function ShowError
 }
 
 ##Si el programa supera o es menor a los 4 argumentos muestra el modo de uso y sale
-if [[ $# -ne 4 ]]; then
+if [[ $# -lt 4 ]]; then
 	UsageAndExit
 fi
 
 ##Recopilación de Argumentos en variables
 path="$1"
-condicionselec="$2"
-criterioselec="$3"
-accion="$4"
-estadoUsuario=$UID
+shift
+condicionselec="$1"
+shift
+criterioselec="$1"
+shift
+accion="$1"
+shift
+pipe=()
+for i in $@; do
+	pipe+=($i)
+	shift
+done
+arrayFicheros=()
 
 ##Ejecuta la acción escrita en el ultimo argumento
 ## Argumento1: Nombre del archivo.
 function DoAction
-{
-	fichero=$1
+{	
 	case $accion in
 		-print) 
 			##Si se encuentra en el directorio actual cambia el formato de impresión
-			if [[ "$path" == "$PWD" ]]; then 					echo "./$fichero"
-			else
-				echo "$path/$fichero"
-			fi
+			for fichero in "${arrayFicheros[@]}"; do
+				if [[ "$path" == "$PWD" ]]; then 				
+					printf './%s\n' "$fichero"
+				else
+					printf '%s/%s\n' "$path" "$fichero"
+				fi
+			done
+			;;
+		-pipe)
 			;;
 		*) 
 			##Si no hay un argumento válido lanza el siguiente error.
@@ -61,13 +74,13 @@ do
 				f) 
 					##Si el archivo es un archivo regular pasa el archivo
 					if [[ -f $path/$file ]]; then
-						DoAction $file
+						arrayFicheros+=($file)
 					fi
 					;;
 				d) 
 					##Si el archivo es un directorio, pasa el archivo
 					if [[ -d $path/$file ]]; then
-						DoAction $file
+						arrayFicheros+=($file)
 					fi
 					;;
 				*) 
@@ -79,21 +92,22 @@ do
 		-n)
 			##Si el nombre del archivo contiene alguno de los caracteres indicados, ejecuta una acción
 			if [[ "$file" == *"$criterioselec"* ]]; then
-				DoAction $file
+				arrayFicheros+=($file)
 			fi
 			;;
 		-p)	
 			##Si los permisos del archivo (stat -c %A - Legibles en lenguaje humano) son iguales a los escritos...
 			permisos=$(stat -c %A $path/$file)
 			if [[ "$permisos" == *"$criterioselec"* ]]; then
-				DoAction $file
+				arrayFicheros+=($file)
 			fi
 			;;
 		-c)
 			##Si se encuentra la cadena (usando grep -s para eliminar advertencias) ejecuta una acción
 			if [[ $(grep -s $criterioselec < $path/$file) ]]; then
-				DoAction $file
+				arrayFicheros+=($file)
 			fi
 			;;		
 	esac
 done
+DoAction
