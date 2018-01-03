@@ -15,6 +15,7 @@ function ShowError
 	echo "$0: Error($1) $2"
 }
 
+
 ##Si el programa supera o es menor a los 4 argumentos muestra el modo de uso y sale
 if [[ $# -lt 4 ]]; then
 	UsageAndExit
@@ -46,9 +47,11 @@ function DoAction
 			;;
 		-exec)
 			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion
-			comprobacion="command -v $mandato"				##Comprueba si el comando existe (falta saber como saber si lo devuelvo o no lo devuelve)	
-			if [[ $($comprobacion) ]]; then 		
-				echo "Nice"
+			##Para ver si existe el mandato [solucionar problema de impresion (se imprime lo que comprueba el comando)]
+			comprobacion="command -v $mandato"		
+			$comprobacion
+			if [[ $? -eq 0 ]]; then 
+			 	##Meter el fork para poder crear hijos				
 			else
 				ShowError 4 "No se puede ejecutar el comando"
 			fi
