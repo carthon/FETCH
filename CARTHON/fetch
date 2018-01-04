@@ -15,6 +15,9 @@ function ShowError
 	echo "$0: Error($1) $2"
 }
 
+##Funcion de impresion segun el formato dado
+## Argumento1: Imprime el fichero con el formato especificado
+## SinArgumento: Imprime los ficheros almacenados en el arrayFicheros
 function DoPrint
 {
 	##Si se encuentra en el directorio actual cambia el formato de impresión
@@ -75,7 +78,7 @@ function DoAction
 			fi
 			;;
 		-exec)
-			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion
+			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion e imprime el resultado de dichos procesos
 			if hash ${pipe[1]} 2>/dev/null; then 
 			 	for f in "${arrayFicheros[@]}"; do
 					(
@@ -99,6 +102,7 @@ if [ ! -r $path ]; then
 	ShowError 2 "No se puede leer el directorio."
 	exit 1
 fi
+
 ##Iniciamos un bucle que compruebe todos los archivos en el path dado.
 for file in $(ls $path);
 do
