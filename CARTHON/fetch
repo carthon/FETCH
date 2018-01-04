@@ -79,8 +79,8 @@ function DoAction
 			;;
 		-exec)
 			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion e imprime el resultado de dichos procesos
-			if hash ${pipe[1]} 2>/dev/null; then 
-			 	for f in "${arrayFicheros[@]}"; do
+			if hash ${pipe[1]} 2>/dev/null; then
+				for f in "${arrayFicheros[@]}"; do
 					(
 						printf '%s ' "$(${pipe[@]} < $path/$f)"
 						DoPrint $f
