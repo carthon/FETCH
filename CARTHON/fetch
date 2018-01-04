@@ -15,12 +15,30 @@ function ShowError
 	echo "$0: Error($1) $2"
 }
 
+function DoPrint
+{
+	##Si se encuentra en el directorio actual cambia el formato de impresión
+	if [[ $# -eq 1 ]]; then
+		if [[ "$path" == "$PWD" ]]; then 				
+				printf './%s\n' "$1"
+			else
+				printf '%s/%s\n' "$path" "$1"
+			fi
+
+	else
+		for fichero in "${arrayFicheros[@]}"; do
+			if [[ "$path" == "$PWD" ]]; then 				
+				printf './%s\n' "$fichero"
+			else
+				printf '%s/%s\n' "$path" "$fichero"
+			fi
+		done
+	fi
+}
+
 ##Si el programa supera o es menor a los 4 argumentos muestra el modo de uso y sale
 if [[ $# -lt 4 ]]; then
 	UsageAndExit
-elif [[ $# -gt 4 ]]; then
-	mandato="$5"
-	argumento="$6"
 fi
 ##Recopilación de Argumentos en variables
 path="$1"
@@ -33,6 +51,7 @@ accion="$1"
 shift
 pipe=()
 for i in $@; do
+	pipe+=(" ")
 	pipe+=($i)
 	shift
 done
@@ -44,24 +63,26 @@ function DoAction
 {	
 	case $accion in
 		-print) 
-			##Si se encuentra en el directorio actual cambia el formato de impresión
-			for fichero in "${arrayFicheros[@]}"; do
-				if [[ "$path" == "$PWD" ]]; then 				
-					printf './%s\n' "$fichero"
-				else
-					printf '%s/%s\n' "$path" "$fichero"
-				fi
-			done
+			DoPrint
 			;;
 		-pipe)
+			##Si existe el comando indicado en el primer argumento del pipe, ejecuta el comando, sino muestra error.
+			if hash ${pipe[1]} 2>/dev/null; then
+				##Traslada la información extraida archivo a archivo al mandato en pipe y lo imprime.
+				${pipe[@]} <(for f in "${arrayFicheros[@]}"; do DoPrint $f; done)
+			else
+ 			 	ShowError 4 "No se puede ejecutar el comando"
+			fi
 			;;
 		-exec)
 			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion
-			##Para ver si existe el mandato [solucionar problema de impresion (se imprime lo que comprueba el comando)]
-			comprobacion="command -v $mandato"		
-			$comprobacion
-			if [[ $? -eq 0 ]]; then 
-			 	##Meter el fork para poder crear hijos				
+			if hash ${pipe[1]} 2>/dev/null; then 
+			 	for f in "${arrayFicheros[@]}"; do
+					(
+						printf '%s ' "$(${pipe[@]} < $path/$f)"
+						DoPrint $f
+					)				
+				done
 			else
 				ShowError 4 "No se puede ejecutar el comando"
 			fi
