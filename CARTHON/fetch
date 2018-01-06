@@ -75,6 +75,7 @@ function DoAction
 				${pipe[@]} <(for f in "${arrayFicheros[@]}"; do DoPrint $f; done)
 			else
  			 	ShowError 4 "No se puede ejecutar el comando"
+				exit 1
 			fi
 			;;
 		-exec)
@@ -88,6 +89,7 @@ function DoAction
 				done
 			else
 				ShowError 4 "No se puede ejecutar el comando"
+				exit 1
 			fi
 			;;
 		*) 
