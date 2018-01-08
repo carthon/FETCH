@@ -65,8 +65,12 @@ arrayFicheros=()
 function DoAction
 {	
 	case $accion in
-		-print) 
+		-print) 			
+			if [[ ! -z ${pipe[1]} ]]; then 
+				echo "WARNING: Ha introducido un comando extra innecesario."
+			fi
 			DoPrint
+
 			;;
 		-pipe)
 			##Si existe el comando indicado en el primer argumento del pipe, ejecuta el comando, sino muestra error.
@@ -74,7 +78,7 @@ function DoAction
 				##Traslada la información extraida archivo a archivo al mandato en pipe y lo imprime.
 				${pipe[@]} <(for f in "${arrayFicheros[@]}"; do DoPrint $f; done)
 			else
- 			 	ShowError 4 "No se puede ejecutar el comando"
+ 			 	ShowError 4 "No se puede ejecutar el comando: ${pipe[1]}"
 				exit 1
 			fi
 			;;
@@ -88,7 +92,7 @@ function DoAction
 					)				
 				done
 			else
-				ShowError 4 "No se puede ejecutar el comando"
+				ShowError 4 "No se puede ejecutar el comando: ${pipe[1]}"
 				exit 1
 			fi
 			;;
@@ -125,6 +129,7 @@ do
 					;;
 				*) 
 					ShowError 1 "Opción no válida."
+					exit 1
 					;;
 			esac
 			;;
@@ -144,10 +149,16 @@ do
 			;;
 		-c)
 			##Si se encuentra la cadena (usando grep -s para eliminar advertencias) ejecuta una acción
-			if [[ $(grep -s $criterioselec < $path/$file) ]]; then
-				arrayFicheros+=($file)
+			if [[ -r $path/$file ]]; then
+				if [[ $(grep -s $criterioselec < $path/$file) ]]; then
+					arrayFicheros+=($file)
+				fi
+			else 
+				ShowError 3 "No se puede leer el archivo: $file"			
 			fi
-			;;		
+			;;	
+		*)
+			ShowError 1 "Opción no válida"	
 	esac
 done
 DoAction
