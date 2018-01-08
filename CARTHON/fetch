@@ -70,7 +70,7 @@ function DoAction
 			;;
 		-pipe)
 			##Si existe el comando indicado en el primer argumento del pipe, ejecuta el comando, sino muestra error.
-			if hash ${pipe[1]} 2>/dev/null; then
+			if [ ! -z ${pipe[1]} ] && hash ${pipe[1]} 2>/dev/null; then
 				##Traslada la información extraida archivo a archivo al mandato en pipe y lo imprime.
 				${pipe[@]} <(for f in "${arrayFicheros[@]}"; do DoPrint $f; done)
 			else
@@ -80,7 +80,7 @@ function DoAction
 			;;
 		-exec)
 			##Lanza un proceso por cada uno de los archivos que cumplan el criterio de seleccion e imprime el resultado de dichos procesos
-			if hash ${pipe[1]} 2>/dev/null; then
+			if [ ! -z ${pipe[1]} ] && hash ${pipe[1]} 2>/dev/null; then
 				for f in "${arrayFicheros[@]}"; do
 					(
 						printf '%s ' "$(${pipe[@]} < $path/$f)"
