@@ -24,6 +24,8 @@ function DoPrint
 	if [[ $# -eq 1 ]]; then
 		if [[ "$path" == "$PWD" ]]; then 				
 				printf './%s\n' "$1"
+			elif [[ "$path" == "/" ]]; then
+				printf '%s%s\n' "$path" "$1"
 			else
 				printf '%s/%s\n' "$path" "$1"
 			fi
@@ -31,10 +33,12 @@ function DoPrint
 	else
 		for fichero in "${arrayFicheros[@]}"; do
 			if [[ "$path" == "$PWD" ]]; then 				
-				printf './%s\n' "$fichero"
-			else
-				printf '%s/%s\n' "$path" "$fichero"
-			fi
+					printf './%s\n' "$1"
+				elif [[ "$path" == "/" ]]; then
+					printf '%s%s\n' "$path" "$fichero"
+				else
+					printf '%s/%s\n' "$path" "$fichero"
+				fi
 		done
 	fi
 }
