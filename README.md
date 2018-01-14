@@ -1,9 +1,9 @@
-1. Introducción
+1. Introducción:
 El objetivo del trabajo es la realización de un comando para Linux capaz de realizar la búsqueda de ficheros dentro del árbol 
 de directorios de acuerdo a unos criterios especificados como argumentos en la ejecución de la aplicación. 
 Este comando se realiza para la práctica final de la asignatura de Sistemas Operativos. 
 
-2. Manual de operaciones
+2. Manual de operaciones:
 En este apartado se muestra los tipos de selecciones que se pueden hacer, que acciones se pueden realizar y su respectiva 
 gestión de errores:
 
